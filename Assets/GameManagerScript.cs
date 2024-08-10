@@ -53,30 +53,20 @@ public class GameManagerScript : MonoBehaviour
     bool MoveNumber(Vector2Int moveFrom, Vector2Int moveTo)
     {
         // 動けない場合は false を返す
-        if (moveTo.y < 0 || moveTo.y >= field.GetLength(0))
-            return false;
-        if (moveTo.x < 0 || moveTo.x >= field.GetLength(1))
-            return false;
+        if (moveTo.y < 0 || moveTo.y >= field.GetLength(0)) { return false; }
+        if (moveTo.x < 0 || moveTo.x >= field.GetLength(1)) { return false; }
 
-        if (field[moveTo.y, moveTo.x] != null
-            && field[moveTo.y, moveTo.x].tag == "Box")
+        if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Box")
         {
             Vector2Int velocity = moveTo - moveFrom;    // 移動方向を計算する
             bool success = MoveNumber(moveTo, moveTo + velocity);
-            if (!success)
-                return false;
+            if (!success) { return false; }
         }   // 移動先に箱がいた場合の処理
 
         // プレイヤー・箱の共通処理
+        field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, -1 * moveTo.y, 0);
         field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
         field[moveFrom.y, moveFrom.x] = null;
-        // オブジェクトのシーン上の座標を動かす
-        //field[moveTo.y, moveTo.x].transform.position =
-        //    new Vector3(moveTo.x, -1 * moveTo.y, 0);
-        // プレイヤーor箱のオブジェクトから、Moveコンポーネントをとってくる
-        Move move = field[moveTo.y, moveTo.x].GetComponent<Move>();
-        // Moveコンポーネントに対して、動けと命令する
-        move.MoveTo(new Vector3(moveTo.x, -1 * moveTo.y, 0));
 
         return true;
     }
@@ -106,13 +96,16 @@ public class GameManagerScript : MonoBehaviour
 
     void Start()
     {
+        Screen.SetResolution(1280, 720, false);
         clearText.SetActive(false);
 
         map = new int[,]
         {
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3 },
-            { 3, 0, 0, 0, 0, 3, 2, 2, 1, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 3, 2, 2, 1, 0, 0, 0, 0, 0 },
+            { 3, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         };  // 0: 何もない, 1: プレイヤー, 2: 箱
 
         field = new GameObject
@@ -153,7 +146,7 @@ public class GameManagerScript : MonoBehaviour
         }
     }
 
-    void Update()
+        void Update()
     {
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
